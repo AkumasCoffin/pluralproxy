@@ -1,2 +1,125 @@
-# pluralproxy
+# Plural Proxy
 
+A private, encrypted dashboard for DID/OSDD plural systems — organize alter profiles, track fronting, map relationships, share with friends, journal, and let alters speak on Discord.
+
+---
+
+## Requirements
+
+- **OS:** Ubuntu / Debian Linux
+- **Runtime:** Node.js 20+ (backend), Python 3.10+ (Discord bot)
+- **Database:** PostgreSQL 14+
+- **Process Manager:** PM2
+- **Auth:** [Clerk](https://clerk.com) account with Discord SSO enabled
+- **Reverse Proxy:** Cloudflare Tunnel, nginx, or Caddy (for HTTPS)
+
+---
+
+## Quick Start
+
+```bash
+# 1. Clone the repo
+git clone <repo-url> /var/www/plural-proxy
+cd /var/www/plural-proxy
+
+# 2. Copy and fill in your environment file
+cp example.env .env
+nano .env   # fill in all values (see Environment Variables below)
+
+# 3. Run the install script (first-time only)
+sudo bash install.sh
+
+# 4. Point your reverse proxy to http://localhost:3001
+#    Then open https://pluralproxy.forcequit.xyz
+```
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the project root (or copy `example.env`):
+
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk publishable key (`pk_live_...`) |
+| `CLERK_SECRET_KEY` | Clerk secret key (`sk_live_...`) |
+| `DISCORD_BOT_TOKEN` | Discord bot token |
+| `PORT` | Backend port (default: `3001`) |
+| `PG_HOST` | PostgreSQL host (default: `localhost`) |
+| `PG_PORT` | PostgreSQL port (default: `5432`) |
+| `PG_DATABASE` | PostgreSQL database name (default: `did_tracker`) |
+| `PG_USER` | PostgreSQL user (default: `postgres`) |
+| `PG_PASSWORD` | PostgreSQL password |
+| `DATA_ENCRYPTION_KEY` | **Auto-generated** by `install.sh` — do not set manually |
+
+---
+
+## Install (First Time)
+
+Run the install script as root:
+
+```bash
+sudo bash install.sh
+```
+
+This will:
+1. Install Node.js 20.x (if not present)
+2. Install PM2 globally
+3. Install Python dependencies (Discord bot)
+4. Install Node.js backend dependencies (`npm ci`)
+5. Create the PostgreSQL database
+6. Create asset directories with correct ownership
+7. Fix Windows line endings
+8. Generate `DATA_ENCRYPTION_KEY` (if not already set)
+9. Lock down the `.env` file permissions
+10. Start the Node.js backend via PM2
+11. Start the Discord bot via PM2
+
+---
+
+## Update (After File Changes)
+
+After uploading or pulling new files, run:
+
+```bash
+sudo bash update.sh
+```
+
+This will:
+1. Fix Windows line endings
+2. Install backend dependencies (`npm ci`)
+3. Fix asset directory ownership
+4. Restart the Node.js backend
+5. Restart the Discord bot
+6. Save PM2 process list
+
+---
+
+## Clerk Setup
+
+1. Go to your [Clerk Dashboard](https://dashboard.clerk.com)
+2. Navigate to **Social Connections** → **Discord** → **ON**
+3. Use custom Discord OAuth credentials (from the [Discord Developer Portal](https://discord.com/developers/applications))
+4. Set your Clerk publishable and secret keys in `.env`
+
+---
+
+## PM2 Cheat Sheet
+
+| Command | Description |
+|---|---|
+| `pm2 status` | See running processes |
+| `pm2 logs plural-proxy-backend` | Tail backend logs |
+| `pm2 logs plural-proxy-bot` | Tail bot logs |
+| `pm2 restart plural-proxy-backend` | Restart backend after code changes |
+| `pm2 restart plural-proxy-bot` | Restart bot after code changes |
+| `pm2 stop all` | Stop everything |
+
+---
+
+## Important
+
+> **⚠️ BACK UP YOUR `.env` FILE!**
+>
+> The `DATA_ENCRYPTION_KEY` inside `.env` is the only key that can decrypt your database.
+> **Losing it means ALL user data is permanently unrecoverable.**
