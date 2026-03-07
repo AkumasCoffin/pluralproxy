@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plural Proxy — Alter Dashboard &amp; Discord Bot</title>
+  <meta name="description" content="A private dashboard for DID/OSDD plural systems — organize alter profiles, track fronting, map relationships, share with friends, and let alters speak on Discord.">
+  <meta name="theme-color" content="#0f1218">
+  <meta name="author" content="Plural Proxy">
+  <meta name="robots" content="index, follow">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/svg+xml" href="/assets/site/icons/Favicon.svg">
+  <link rel="icon" type="image/png" sizes="512x512" href="/assets/site/icons/Favicon_512x512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/site/icons/Favicon_180x180.png">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{SITE_URL}}/">
+  <meta property="og:title" content="Plural Proxy — Alter Dashboard &amp; Discord Bot">
+  <meta property="og:description" content="A private dashboard for DID/OSDD plural systems — organize alter profiles, track fronting, map relationships, share with friends, and let alters speak on Discord.">
+  <meta property="og:image" content="{{SITE_URL}}/assets/og-image.png">
+  <meta property="og:site_name" content="Plural Proxy">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Plural Proxy — Alter Dashboard &amp; Discord Bot">
+  <meta name="twitter:description" content="A private dashboard for DID/OSDD plural systems — organize alter profiles, track fronting, map relationships, share with friends, and let alters speak on Discord.">
+  <meta name="twitter:image" content="{{SITE_URL}}/assets/og-image.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0f1218;
+      --bg-card:    #161b25;
+      --bg-card-2:  #1a2030;
+      --border:     rgba(255,255,255,.07);
+      --accent:     #6d9fff;
+      --accent-glow: rgba(109,159,255,.15);
+      --text-hi:    #e2e8f4;
+      --text-mid:   #a3b1cc;
+      --text-dim:   #6b7a94;
+      --purple:     #a78bfa;
+      --green:      #34d399;
+      --pink:       #f472b6;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text-mid);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Hero background gradient ── */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero-bg::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140%;
+      height: 100%;
+      background: radial-gradient(ellipse at 50% 0%, rgba(109,159,255,.12) 0%, transparent 65%),
+                  radial-gradient(ellipse at 30% 20%, rgba(167,139,250,.08) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 30%, rgba(52,211,153,.06) 0%, transparent 50%);
+    }
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      background: linear-gradient(to top, var(--bg), transparent);
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(15,18,24,.75);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--text-hi);
+      text-decoration: none;
+    }
+    .nav-brand .logo-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #fff;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-links a {
+      font: 500 13px/1 'Inter', sans-serif;
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      transition: all .15s;
+    }
+    .nav-links a:hover {
+      color: var(--text-hi);
+      background: rgba(255,255,255,.04);
+    }
+    .nav-links .btn-cta {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 10px;
+    }
+    .nav-links .btn-cta:hover {
+      background: #5a8aee;
+      color: #fff;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 160px 24px 100px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font: 600 11px/1 'Inter', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--accent);
+      background: var(--accent-glow);
+      border: 1px solid rgba(109,159,255,.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font: 800 clamp(36px, 5.5vw, 64px)/1.08 'Inter', sans-serif;
+      color: var(--text-hi);
+      margin-bottom: 20px;
+      letter-spacing: -.02em;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p.subtitle {
+      font-size: clamp(16px, 2vw, 19px);
+      line-height: 1.6;
+      color: var(--text-mid);
+      max-width: 600px;
+      margin-bottom: 40px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font: 600 14px/1 'Inter', sans-serif;
+      padding: 14px 28px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all .2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(109,159,255,.3);
+    }
+    .btn-primary:hover {
+      background: #5a8aee;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 32px rgba(109,159,255,.4);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,.06);
+      color: var(--text-hi);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,.1);
+      border-color: rgba(255,255,255,.15);
+      transform: translateY(-1px);
+    }
+    .btn-discord {
+      background: #5865f2;
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(88,101,242,.3);
+    }
+    .btn-discord:hover {
+      background: #4752c4;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 32px rgba(88,101,242,.4);
+    }
+
+    /* ── Sections ── */
+    section {
+      position: relative;
+      padding: 100px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font: 600 11px/1 'Inter', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font: 700 clamp(26px, 3.5vw, 38px)/1.15 'Inter', sans-serif;
+      color: var(--text-hi);
+      margin-bottom: 16px;
+      letter-spacing: -.01em;
+    }
+    .section-desc {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-dim);
+      max-width: 560px;
+      margin-bottom: 48px;
+    }
+
+    /* ── Feature grid ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: all .2s;
+    }
+    .feature-card:hover {
+      border-color: rgba(109,159,255,.2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,.3);
+    }
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font: 600 16px/1.3 'Inter', sans-serif;
+      color: var(--text-hi);
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-dim);
+    }
+
+    /* ── Bot section ── */
+    .bot-section {
+      text-align: center;
+    }
+    .bot-card {
+      background: rgba(22,27,37,.55);
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      border: 1px solid rgba(88,101,242,.18);
+      border-radius: 20px;
+      padding: 48px 32px;
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(88,101,242,.08), 0 0 0 1px rgba(255,255,255,.03) inset;
+    }
+    .bot-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(88,101,242,.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .bot-card .bot-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #5865f2, #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: #fff;
+      margin: 0 auto 24px;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 4px 24px rgba(88,101,242,.3);
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .bot-card:hover .bot-icon {
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 0 8px 32px rgba(88,101,242,.45);
+    }
+    .bot-card h3 {
+      font: 700 24px/1.2 'Inter', sans-serif;
+      color: var(--text-hi);
+      margin-bottom: 12px;
+      position: relative; z-index: 1;
+    }
+    .bot-card p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-dim);
+      margin-bottom: 28px;
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+      position: relative; z-index: 1;
+    }
+    .bot-perms {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 28px;
+      position: relative; z-index: 1;
+    }
+    .bot-perms span {
+      font: 500 11px/1 'Inter', sans-serif;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(88,101,242,.1);
+      color: #818cf8;
+      border: 1px solid rgba(88,101,242,.15);
+      transition: all .2s ease;
+    }
+    .bot-perms span:hover {
+      background: rgba(88,101,242,.18);
+      border-color: rgba(88,101,242,.3);
+      transform: translateY(-1px);
+    }
+
+    /* ── About ── */
+    .about-grid {
+      display: grid;
+        grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+    .about-text p {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text-mid);
+      margin-bottom: 16px;
+    }
+    .about-text p strong {
+      color: var(--text-hi);
+    }
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-card .stat-icon {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .stat-card .stat-label {
+      font: 600 11px/1 'Inter', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--text-dim);
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 16px; }
+      .nav-links a:not(.btn-cta) { display: none; }
+      .hero { padding: 130px 16px 60px; }
+      .about-grid { grid-template-columns: 1fr; }
+      .feature-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Micro-interactions ── */
+    .nav-brand .logo-icon {
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .nav-brand:hover .logo-icon {
+      transform: rotate(8deg) scale(1.1);
+      box-shadow: 0 4px 16px rgba(109,159,255,.3);
+    }
+
+    .btn {
+      transition: all .2s cubic-bezier(.22,.68,0,1);
+    }
+    .btn:active {
+      transform: translateY(0) scale(.97) !important;
+    }
+
+    .feature-icon {
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .feature-card:hover .feature-icon {
+      transform: scale(1.1) translateY(-2px);
+    }
+
+    .stat-card {
+      transition: all .25s ease;
+    }
+    .stat-card:hover {
+      border-color: rgba(109,159,255,.18);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    }
+    .stat-card .stat-icon {
+      transition: transform .3s ease;
+    }
+    .stat-card:hover .stat-icon {
+      transform: scale(1.15);
+    }
+
+    .nav-links a {
+      transition: all .2s cubic-bezier(.22,.68,0,1);
+    }
+    .nav-links a:active {
+      transform: scale(.95);
+    }
+
+    .hero-badge {
+      transition: all .3s ease;
+    }
+    .hero-badge:hover {
+      background: rgba(109,159,255,.22);
+      border-color: rgba(109,159,255,.35);
+      transform: translateY(-1px);
+    }
+
+    /* Gradient border on feature card hover */
+    .feature-card {
+      position: relative;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 16px;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(109,159,255,.25), rgba(167,139,250,.15), transparent 60%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity .3s ease;
+      pointer-events: none;
+    }
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    /* ── "Free Forever" pricing badge ── */
+    .pricing-section {
+      text-align: center;
+      padding: 60px 24px 20px;
+    }
+    .pricing-card {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(22,27,37,.5);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(52,211,153,.15);
+      border-radius: 20px;
+      padding: 36px 48px;
+      max-width: 420px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+    .pricing-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(52,211,153,.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .pricing-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font: 800 28px/1 'Inter', sans-serif;
+      color: #34d399;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 12px;
+    }
+    .pricing-badge i { font-size: 24px; }
+    .pricing-sub {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-dim);
+      position: relative;
+      z-index: 1;
+      max-width: 320px;
+    }
+    .pricing-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .pricing-features span {
+      font: 500 11px/1 'Inter', sans-serif;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: rgba(52,211,153,.08);
+      color: #6ee7b7;
+      border: 1px solid rgba(52,211,153,.12);
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in {
+      animation: fadeUp .6s ease-out both;
+    }
+    .delay-1 { animation-delay: .1s; }
+    .delay-2 { animation-delay: .2s; }
+    .delay-3 { animation-delay: .3s; }
+    .delay-4 { animation-delay: .4s; }
+    .delay-5 { animation-delay: .5s; }
+    .delay-6 { animation-delay: .6s; }
+  </style>
+</head>
+<body>
+
+  <!-- ── Nav ── -->
+  <nav>
+    <a href="/" class="nav-brand">
+      <div class="logo-icon"><i class="fa-solid fa-users"></i></div>
+      Plural Proxy
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#bot">Discord Bot</a>
+      <a href="#about">About</a>
+      <a href="/dashboard" class="btn-cta"><i class="fa-solid fa-arrow-right-to-bracket"></i> Dashboard</a>
+  </div>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <header class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-badge animate-in"><i class="fa-solid fa-users"></i> Built for Plural Systems</div>
+    <h1 class="animate-in delay-1">Manage your system,<br><span class="gradient">your way.</span></h1>
+    <p class="subtitle animate-in delay-2">A private dashboard to organize your alters, track who's fronting, map inner relationships, share safely with friends, and let alters speak on Discord in their own voice.</p>
+    <div class="hero-actions animate-in delay-3">
+      <a href="/dashboard" class="btn btn-primary"><i class="fa-solid fa-arrow-right-to-bracket"></i> Open Dashboard</a>
+      <a href="#bot" class="btn btn-discord"><i class="fa-brands fa-discord"></i> Add to Discord</a>
+    </div>
+  </header>
+
+  <!-- ── Features ── -->
+  <section id="features">
+    <div class="section-label"><i class="fa-solid fa-sparkles"></i> Features</div>
+    <h2 class="section-title">Everything you need in one place.</h2>
+    <p class="section-desc">Built by and for plural systems. Track details, map relationships, manage fronting, and share safely.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card animate-in delay-1">
+        <div class="feature-icon" style="background:rgba(109,159,255,.1);color:var(--accent)"><i class="fa-solid fa-id-card-clip"></i></div>
+        <h3>Rich Alter Profiles</h3>
+        <p>Track names, ages, roles, pronouns, triggers, boundaries, interests, and dozens more fields per alter. Fully customizable.</p>
+    </div>
+      <div class="feature-card animate-in delay-2">
+        <div class="feature-icon" style="background:rgba(167,139,250,.1);color:var(--purple)"><i class="fa-solid fa-diagram-project"></i></div>
+        <h3>Relationship Map</h3>
+        <p>Visualize connections between alters and external relationships on an interactive force-directed graph.</p>
+    </div>
+      <div class="feature-card animate-in delay-3">
+        <div class="feature-icon" style="background:rgba(52,211,153,.1);color:var(--green)"><i class="fa-solid fa-notes-medical"></i></div>
+        <h3>Therapy &amp; Wellbeing Tools</h3>
+        <p>Log triggers, boundaries, coping strategies, therapy notes, and mental health details for each alter — all in one safe place.</p>
+    </div>
+      <div class="feature-card animate-in delay-4">
+        <div class="feature-icon" style="background:rgba(88,101,242,.1);color:#818cf8"><i class="fa-brands fa-discord"></i></div>
+        <h3>Discord Auto-Proxy</h3>
+        <p>Alters can speak with their own name and profile picture in Discord. Set a fronter and messages proxy automatically.</p>
+      </div>
+      <div class="feature-card animate-in delay-5">
+        <div class="feature-icon" style="background:rgba(244,114,182,.1);color:var(--pink)"><i class="fa-solid fa-user-group"></i></div>
+        <h3>Friends &amp; Sharing</h3>
+        <p>Add friends, share selected alters with privacy controls, and let trusted people understand your system better.</p>
+    </div>
+      <div class="feature-card animate-in delay-6">
+        <div class="feature-icon" style="background:rgba(251,191,36,.1);color:#fbbf24"><i class="fa-solid fa-bolt"></i></div>
+        <h3>Fronting Tracker</h3>
+        <p>Set primary and secondary fronters via the website or Discord. Fronting status syncs across both platforms instantly.</p>
+      </div>
+      <div class="feature-card animate-in delay-1">
+        <div class="feature-icon" style="background:rgba(129,140,248,.1);color:#818cf8"><i class="fa-solid fa-book"></i></div>
+        <h3>System Journal</h3>
+        <p>Per-alter journal entries with tags, timestamps, and encryption. Write from the dashboard or Discord — everything syncs automatically.</p>
+      </div>
+      <div class="feature-card animate-in delay-2">
+        <div class="feature-icon" style="background:rgba(52,211,153,.1);color:var(--green)"><i class="fa-solid fa-lock"></i></div>
+        <h3>Encrypted at Rest</h3>
+        <p>All sensitive data is encrypted with AES-256-GCM. Your system info stays private — nothing is readable without your key.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Discord Bot ── -->
+  <section id="bot" class="bot-section">
+    <div class="section-label"><i class="fa-brands fa-discord"></i> Discord Integration</div>
+    <h2 class="section-title">Bring your system to Discord.</h2>
+    <p class="section-desc" style="margin-left:auto;margin-right:auto">Auto-proxy messages as your fronting alter with their name and avatar. Manage alters, fronting, and proxies — all from slash commands.</p>
+
+    <div class="bot-card animate-in">
+      <div class="bot-icon"><i class="fa-brands fa-discord"></i></div>
+      <h3>Plural Proxy Bot</h3>
+      <p>Add the bot to your server to enable alter-based message proxying, fronting management, journal entries, and system lookups — right from Discord.</p>
+      <div class="bot-perms">
+        <span><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i> Send Messages</span>
+        <span><i class="fa-solid fa-pen" style="margin-right:4px"></i> Manage Messages</span>
+        <span><i class="fa-solid fa-clock-rotate-left" style="margin-right:4px"></i> Read Message History</span>
+        <span><i class="fa-solid fa-terminal" style="margin-right:4px"></i> Slash Commands</span>
+        <span><i class="fa-solid fa-link" style="margin-right:4px"></i> Manage Webhooks</span>
+  </div>
+      <a id="botInviteLink" href="#" class="btn btn-discord" style="font-size:15px;padding:16px 32px">
+        <i class="fa-solid fa-plus"></i> Add to Server
+      </a>
+      <p style="font-size:11px;color:var(--text-dim);margin-top:16px;margin-bottom:0">
+        The bot needs <strong style="color:var(--text-mid)">Send Messages</strong>, <strong style="color:var(--text-mid)">Manage Messages</strong>, <strong style="color:var(--text-mid)">Read Message History</strong>, <strong style="color:var(--text-mid)">Slash Commands</strong>, and <strong style="color:var(--text-mid)">Manage Webhooks</strong> permissions.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── About ── -->
+  <section id="about">
+    <div class="section-label"><i class="fa-solid fa-heart"></i> About</div>
+    <h2 class="section-title">Built for plural systems.</h2>
+
+    <div class="about-grid">
+      <div class="about-text">
+        <p><strong>Plural Proxy</strong> is a private platform designed to help DID, OSDD, and other plural systems organize and understand themselves better.</p>
+        <p>Every alter gets a rich profile with dozens of customizable fields — from basic info like name and pronouns, to detailed notes on triggers, boundaries, coping strategies, and therapy notes.</p>
+        <p>The <strong>relationship map</strong> gives you a visual overview of how alters relate to each other and to external people. The <strong>friends system</strong> lets you selectively share alters with trusted people, so they can better understand your system.</p>
+        <p>Your data is private by default — nothing is shared unless you explicitly choose to share it, and everything is securely stored.</p>
+      </div>
+      <div class="about-stats">
+        <div class="stat-card">
+          <div class="stat-icon" style="color:var(--accent)"><i class="fa-solid fa-id-card-clip"></i></div>
+          <div class="stat-label">Rich Alter Profiles</div>
+      </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="color:var(--purple)"><i class="fa-solid fa-diagram-project"></i></div>
+          <div class="stat-label">Relationship Maps</div>
+      </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="color:var(--green)"><i class="fa-brands fa-discord"></i></div>
+          <div class="stat-label">Discord Integration</div>
+    </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="color:var(--pink)"><i class="fa-solid fa-eye-slash"></i></div>
+          <div class="stat-label">Privacy First</div>
+  </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Free Forever ── -->
+  <section class="pricing-section">
+    <div class="pricing-card animate-in">
+      <div class="pricing-badge"><i class="fa-solid fa-heart"></i> Free Forever</div>
+      <p class="pricing-sub">No premium tiers, no ads, no data selling. Plural Proxy is completely free — built with love for the community.</p>
+      <div class="pricing-features">
+        <span><i class="fa-solid fa-infinity" style="margin-right:4px"></i> Unlimited Alters</span>
+        <span><i class="fa-solid fa-shield-halved" style="margin-right:4px"></i> Encrypted Data</span>
+        <span><i class="fa-solid fa-eye-slash" style="margin-right:4px"></i> No Tracking</span>
+        <span><i class="fa-solid fa-ban" style="margin-right:4px"></i> No Ads</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section style="text-align:center;padding-bottom:120px">
+    <h2 class="section-title">Ready to get started?</h2>
+    <p class="section-desc" style="margin-left:auto;margin-right:auto">Sign in to your dashboard and start building your system profile today.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="/dashboard" class="btn btn-primary" style="font-size:15px;padding:16px 32px"><i class="fa-solid fa-arrow-right-to-bracket"></i> Open Dashboard</a>
+      <a href="#bot" class="btn btn-secondary" style="font-size:15px;padding:16px 32px"><i class="fa-brands fa-discord"></i> Add Bot to Discord</a>
+          </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <p>&copy; 2026 Plural Proxy &middot; <a href="/dashboard">Dashboard</a> &middot; <a href="#about">About</a> &middot; <a href="#bot">Discord Bot</a></p>
+  </footer>
+
+  <script>
+    // ── Bot invite link ──
+    // Replace YOUR_BOT_CLIENT_ID with your Discord application's client ID.
+    // Permissions integer 2684430336 = Send Messages + Manage Messages + Read Message History + Slash Commands + Manage Webhooks
+    const BOT_CLIENT_ID = "1479102563088466022";
+    const PERMS = 2684430336;
+    const INVITE_URL = `https://discord.com/oauth2/authorize?client_id=${BOT_CLIENT_ID}&permissions=${PERMS}&integration_type=0&scope=bot%20applications.commands`;
+    document.getElementById("botInviteLink").href = INVITE_URL;
+
+    // ── Scroll animations ──
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("animate-in");
+          observer.unobserve(entry.target);
+        }
+      }
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.feature-card, .bot-card, .stat-card, .pricing-card, .about-text, .hero-actions').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

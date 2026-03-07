@@ -1,0 +1,19 @@
+{
+  "name": "plural-proxy-backend",
+  "version": "1.0.0",
+  "description": "Node.js backend for Plural Proxy — migrated from Python CGI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "jwks-rsa": "^3.1.0",
+    "pg": "^8.13.0",
+    "uuid": "^9.0.1"
+  }
+}

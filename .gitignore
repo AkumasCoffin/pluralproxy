@@ -20,3 +20,5 @@ __pycache__/
 
 # ── Personal notes ───────────────────────────────────────────────────
 dbeaver_dashboards.txt
+example_queries.sql
+schema_dbeaver.sql
