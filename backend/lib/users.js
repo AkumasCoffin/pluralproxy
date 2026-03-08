@@ -2,7 +2,7 @@
  * User operations — auto-created on first data write.
  */
 
-const { pool, now, toJsonSafe } = require('./db');
+const { pool, withTransaction, now, toJsonSafe } = require('./db');
 const { encryptField, decryptField } = require('./encryption');
 const { PROFILE_JSON_TO_COL, PROFILE_COL_TO_JSON } = require('./fields');
 
@@ -88,11 +88,12 @@ async function getUserProfile(userId) {
 }
 
 async function updateUserProfile(userId, profile) {
-  const { pool: _p, withTransaction } = require('./db');
+  // Shallow-copy to avoid mutating the caller's object
+  const data = { ...profile };
   await withTransaction(async (client) => {
     await ensureUser(client, userId);
-    const displayName = profile.display_name;
-    delete profile.display_name;
+    const displayName = data.display_name;
+    delete data.display_name;
     const ts = now();
 
     // Delete existing profile rows
@@ -104,7 +105,7 @@ async function updateUserProfile(userId, profile) {
     let paramIdx = 2;
     const placeholders = ['$1'];
 
-    for (const [jsonKey, value] of Object.entries(profile)) {
+    for (const [jsonKey, value] of Object.entries(data)) {
       const colPrefix = PROFILE_JSON_TO_COL.get(jsonKey);
       if (colPrefix && value) {
         const { nonce, cipher } = encryptField(String(value));
@@ -136,7 +137,6 @@ async function updateUserProfile(userId, profile) {
 }
 
 async function syncAvatarUrl(userId, avatarUrl) {
-  const { withTransaction } = require('./db');
   await withTransaction(async (client) => {
     await ensureUser(client, userId);
     await client.query(

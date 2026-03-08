@@ -1,7 +1,7 @@
 /**
  * Routes for /api/discord?action=...
  *
- * Mirrors the Python discord_api.py CGI endpoints.
+ * Handles Discord integration API actions.
  */
 
 const express = require('express');
@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
     }
   } catch (err) {
     console.error('[discord GET]', err);
-    res.status(500).json({ error: String(err) });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -66,7 +66,7 @@ router.post('/', async (req, res) => {
     }
   } catch (err) {
     console.error('[discord POST]', err);
-    res.status(500).json({ error: String(err) });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

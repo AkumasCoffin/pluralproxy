@@ -1,7 +1,7 @@
 /**
  * Field mappings — JSON ↔ column names for wide tables.
  *
- * Mirrors the Python _ALTER_FIELD_MAP and _PROFILE_FIELD_MAP exactly.
+ * Defines JSON ↔ column name mappings for alter and profile wide tables.
  */
 
 // Each entry: [groupName, jsonFieldName, columnPrefix, groupOrder, fieldOrder]

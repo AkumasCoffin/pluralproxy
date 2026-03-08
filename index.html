@@ -707,15 +707,20 @@
       <div class="bot-perms">
         <span><i class="fa-solid fa-paper-plane" style="margin-right:4px"></i> Send Messages</span>
         <span><i class="fa-solid fa-pen" style="margin-right:4px"></i> Manage Messages</span>
+        <span><i class="fa-solid fa-eye" style="margin-right:4px"></i> Read Messages</span>
         <span><i class="fa-solid fa-clock-rotate-left" style="margin-right:4px"></i> Read Message History</span>
         <span><i class="fa-solid fa-terminal" style="margin-right:4px"></i> Slash Commands</span>
         <span><i class="fa-solid fa-link" style="margin-right:4px"></i> Manage Webhooks</span>
-  </div>
+        <span><i class="fa-solid fa-at" style="margin-right:4px"></i> Mention Everyone</span>
+        <span><i class="fa-solid fa-paperclip" style="margin-right:4px"></i> Attach Files</span>
+        <span><i class="fa-solid fa-face-smile" style="margin-right:4px"></i> Use External Emojis</span>
+        <span><i class="fa-solid fa-face-grin-stars" style="margin-right:4px"></i> Use External Stickers</span>
+      </div>
       <a id="botInviteLink" href="#" class="btn btn-discord" style="font-size:15px;padding:16px 32px">
         <i class="fa-solid fa-plus"></i> Add to Server
       </a>
       <p style="font-size:11px;color:var(--text-dim);margin-top:16px;margin-bottom:0">
-        The bot needs <strong style="color:var(--text-mid)">Send Messages</strong>, <strong style="color:var(--text-mid)">Manage Messages</strong>, <strong style="color:var(--text-mid)">Read Message History</strong>, <strong style="color:var(--text-mid)">Slash Commands</strong>, and <strong style="color:var(--text-mid)">Manage Webhooks</strong> permissions.
+        The bot needs <strong style="color:var(--text-mid)">Send Messages</strong>, <strong style="color:var(--text-mid)">Manage Messages</strong>, <strong style="color:var(--text-mid)">Read Messages</strong>, <strong style="color:var(--text-mid)">Read Message History</strong>, <strong style="color:var(--text-mid)">Slash Commands</strong>, <strong style="color:var(--text-mid)">Manage Webhooks</strong>, <strong style="color:var(--text-mid)">Mention Everyone</strong>, <strong style="color:var(--text-mid)">Attach Files</strong>, <strong style="color:var(--text-mid)">Use External Emojis</strong>, and <strong style="color:var(--text-mid)">Use External Stickers</strong> permissions.
       </p>
     </div>
   </section>
@@ -784,10 +789,8 @@
 
   <script>
     // ── Bot invite link ──
-    // Replace YOUR_BOT_CLIENT_ID with your Discord application's client ID.
-    // Permissions integer 2684430336 = Send Messages + Manage Messages + Read Message History + Slash Commands + Manage Webhooks
     const BOT_CLIENT_ID = "1479102563088466022";
-    const PERMS = 2684430336;
+    const PERMS = 415001602048;
     const INVITE_URL = `https://discord.com/oauth2/authorize?client_id=${BOT_CLIENT_ID}&permissions=${PERMS}&integration_type=0&scope=bot%20applications.commands`;
     document.getElementById("botInviteLink").href = INVITE_URL;
 

@@ -1,7 +1,7 @@
 /**
  * Routes for /api/journal?action=...
  *
- * Mirrors the Python journal_api.py CGI endpoints.
+ * Handles journal entry API actions.
  */
 
 const express = require('express');
@@ -48,7 +48,7 @@ router.get('/', async (req, res) => {
     }
   } catch (err) {
     console.error('[journal GET]', err);
-    res.status(500).json({ error: String(err) });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -123,7 +123,7 @@ router.post('/', async (req, res) => {
     }
   } catch (err) {
     console.error('[journal POST]', err);
-    res.status(500).json({ error: String(err) });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

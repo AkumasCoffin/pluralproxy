@@ -1,7 +1,7 @@
 {
   "name": "plural-proxy-backend",
   "version": "1.0.0",
-  "description": "Node.js backend for Plural Proxy — migrated from Python CGI",
+  "description": "Node.js backend for Plural Proxy",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

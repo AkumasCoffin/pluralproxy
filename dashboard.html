@@ -73,19 +73,70 @@
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
 
-    /* ---- Toolbar ---- */
+    /* ---- Toolbar / Nav ---- */
     header {
       position: sticky; top: 0; z-index: 20;
-      padding: 10px 28px;
-      background: rgba(12, 14, 20, .88);
+      padding: 0 28px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(12, 14, 20, .82);
       backdrop-filter: blur(20px) saturate(1.5);
       -webkit-backdrop-filter: blur(20px) saturate(1.5);
       border-bottom: 1px solid var(--border);
     }
 
-    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-    .toolbar-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; width: 100%; }
-    .toolbar-row + .toolbar-row { margin-top: 2px; }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text);
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .nav-brand .logo-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #fff;
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .nav-brand:hover .logo-icon {
+      transform: rotate(8deg) scale(1.08);
+      box-shadow: 0 4px 14px rgba(109,159,255,.3);
+    }
+
+    .toolbar-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
+
+    /* ---- Tab toolbar (per-tab controls below tabs) ---- */
+    .tab-toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 10px 0 14px;
+    }
+    .tab-toolbar .spacer { flex: 1; }
+    .tab-toolbar select,
+    .tab-toolbar button {
+      font: 500 12px/1 'Inter', system-ui, sans-serif;
+    }
+    .tab-toolbar input[type="text"] {
+      width: 200px;
+    }
 
     button, select {
       font: 500 12px/1 'Inter', system-ui, sans-serif;
@@ -1519,23 +1570,26 @@
 
     /* ---- Mobile ---- */
     @media (max-width: 640px) {
-      /* Toolbar */
-      header { padding: 8px 14px; }
-      .toolbar-row { gap: 6px; }
-      .toolbar-row button,
-      .toolbar-row select { padding: 7px 10px; font-size: 11px; }
-      .toolbar-row input[type="text"] { width: 100%; min-width: 0; order: 10; font-size: 13px; padding: 9px 12px; }
+      /* Nav header */
+      header { padding: 0 14px; height: 48px; }
+      .nav-brand { font-size: 14px; gap: 8px; }
+      .nav-brand .logo-icon { width: 26px; height: 26px; font-size: 12px; border-radius: 7px; }
+      .toolbar-right { gap: 6px; }
+      .toolbar-right button,
+      .toolbar-right select { padding: 7px 10px; font-size: 11px; }
       .pill { font-size: 9px; padding: 3px 8px; }
 
-      /* Controls row: 2-col grid for filters */
-      #controlsRow {
+      /* Tab toolbar: 2-col grid for filters on mobile */
+      .tab-toolbar {
         display: grid !important;
         grid-template-columns: 1fr 1fr;
         gap: 6px;
+        padding: 8px 0 12px;
       }
-      #controlsRow .spacer { display: none; }
-      #controlsRow select,
-      #controlsRow button { width: 100%; box-sizing: border-box; }
+      .tab-toolbar .spacer { display: none; }
+      .tab-toolbar select,
+      .tab-toolbar button { width: 100%; box-sizing: border-box; }
+      .tab-toolbar input[type="text"] { width: 100%; min-width: 0; grid-column: 1 / -1; font-size: 13px; padding: 9px 12px; }
       #toggleEmptyBtn { grid-column: 1 / -1; }
 
       /* Main content */
@@ -3582,21 +3636,34 @@
   </div>
 
   <header>
-    <div class="toolbar">
-      <div class="toolbar-row">
-        <button id="addAlterBtn" type="button" class="toolbar-btn-add" style="display:none"><i class="fa-solid fa-plus"></i> Add</button>
-        <button id="mapBtn" type="button" style="display:none"><i class="fa-solid fa-diagram-project"></i> Map</button>
-        <div class="spacer"></div>
-        <input id="searchInput" type="text" placeholder="Search…" disabled />
-        <span id="frontingPill" class="fronting-pill" style="display:none" title="Currently fronting"><span class="dot"></span> <span id="frontingPillName">—</span></span>
-        <button id="discordBtn" type="button" class="toolbar-btn-discord" style="display:none"><i class="fa-brands fa-discord"></i> Discord</button>
-        <span id="loadedPill" class="pill">No data</span>
-        <div id="user-button-wrap">
-          <div id="user-button"></div>
-          <span id="notifBadge" class="notif-badge">0</span>
-        </div>
+    <a href="/" class="nav-brand">
+      <div class="logo-icon"><i class="fa-solid fa-users"></i></div>
+      Plural Proxy
+    </a>
+    <div class="toolbar-right">
+      <span id="frontingPill" class="fronting-pill" style="display:none" title="Currently fronting"><span class="dot"></span> <span id="frontingPillName">—</span></span>
+      <button id="discordBtn" type="button" class="toolbar-btn-discord" style="display:none"><i class="fa-brands fa-discord"></i> Discord</button>
+      <span id="loadedPill" class="pill">No data</span>
+      <div id="user-button-wrap">
+        <div id="user-button"></div>
+        <span id="notifBadge" class="notif-badge">0</span>
       </div>
-      <div class="toolbar-row" id="controlsRow" style="display:none">
+    </div>
+  </header>
+
+  <main>
+    <div class="main-tabs" id="mainTabs" style="display:none">
+      <button class="main-tab active" data-tab="alters"><i class="fa-solid fa-users"></i> Alters</button>
+      <button class="main-tab" data-tab="relationships"><i class="fa-solid fa-heart-pulse"></i> External Relationships</button>
+      <button class="main-tab" data-tab="journal"><i class="fa-solid fa-book"></i> Journal</button>
+      <button class="main-tab" data-tab="friends"><i class="fa-solid fa-user-group"></i> Friends<span id="friendsTabBadge" class="tab-badge"></span></button>
+    </div>
+    <div class="tab-content active" id="tabAlters">
+      <div class="tab-toolbar" id="altersToolbar" style="display:none">
+        <button id="addAlterBtn" type="button" class="toolbar-btn-add"><i class="fa-solid fa-plus"></i> Add</button>
+        <button id="mapBtn" type="button"><i class="fa-solid fa-diagram-project"></i> Map</button>
+        <input id="searchInput" type="text" placeholder="Search…" disabled />
+        <div class="spacer"></div>
         <select id="sortSel" title="Sort">
           <option value="id">Sort: ID</option>
           <option value="name">Sort: Name</option>
@@ -3613,25 +3680,17 @@
         <select id="filterAge" title="Filter by age range"><option value="">Age: All</option></select>
         <button id="toggleEmptyBtn" type="button">Hide empty</button>
       </div>
-    </div>
-  </header>
-
-  <main>
-    <div class="main-tabs" id="mainTabs" style="display:none">
-      <button class="main-tab active" data-tab="alters"><i class="fa-solid fa-users"></i> Alters</button>
-      <button class="main-tab" data-tab="relationships"><i class="fa-solid fa-heart-pulse"></i> External Relationships</button>
-      <button class="main-tab" data-tab="journal"><i class="fa-solid fa-book"></i> Journal</button>
-      <button class="main-tab" data-tab="friends"><i class="fa-solid fa-user-group"></i> Friends<span id="friendsTabBadge" class="tab-badge"></span></button>
-    </div>
-    <div class="top-bar">
-      <div class="count" id="summaryHint">Load a JSON file to get started.</div>
-      <div class="status" id="status"></div>
-    </div>
-    <div class="tab-content active" id="tabAlters">
+      <div class="top-bar">
+        <div class="count" id="summaryHint"></div>
+        <div class="status" id="status"></div>
+      </div>
       <div class="filter-bar" id="filterBar"></div>
       <div class="grid" id="grid"></div>
     </div>
     <div class="tab-content" id="tabRelationships">
+      <div class="tab-toolbar" id="relToolbar" style="display:none">
+        <button id="addRelBtn" type="button" class="toolbar-btn-add"><i class="fa-solid fa-plus"></i> Add Person</button>
+      </div>
       <div class="top-bar">
         <div class="count" id="relSummaryHint"></div>
       </div>
@@ -3765,7 +3824,8 @@
     const elSummary = $("summaryHint"), elStatus = $("status"), elPill = $("loadedPill");
     const elSearch = $("searchInput"), elSort = $("sortSel"), elToggle = $("toggleEmptyBtn");
     const elAddAlter = $("addAlterBtn"), elMapBtn = $("mapBtn");
-    const elSortDir = $("sortDirBtn"), elControls = $("controlsRow"), elFilterBar = $("filterBar");
+    const elSortDir = $("sortDirBtn"), elFilterBar = $("filterBar");
+    const elAltersToolbar = $("altersToolbar"), elRelToolbar = $("relToolbar"), elAddRelBtn = $("addRelBtn");
     const elFGender = $("filterGender"), elFRole = $("filterRole");
     const elFPronouns = $("filterPronouns"), elFAge = $("filterAge");
     const elRelGrid = $("relGrid"), elRelSummary = $("relSummaryHint");
@@ -3963,9 +4023,8 @@
     function setEnabled(on) {
       elSearch.disabled = !on; elSort.disabled = !on;
       elToggle.disabled = !on;
-      elControls.style.display = on ? "flex" : "none";
-      elAddAlter.style.display = on ? "" : "none";
-      elMapBtn.style.display = on ? "" : "none";
+      elAltersToolbar.style.display = on ? "flex" : "none";
+      elRelToolbar.style.display = on ? "flex" : "none";
       elMainTabs.style.display = on ? "flex" : "none";
     }
 
@@ -5205,10 +5264,10 @@
         elGrid.innerHTML = `
           <div class="empty-state">
             <div class="icon"><i class="fa-regular fa-folder-open"></i></div>
-            <p class="title">No data loaded yet</p>
-            <p class="hint">Click <span class="mono"><i class="fa-solid fa-rotate-right"></i> Reload</span> to get started.</p>
+            <p class="title">No alters yet</p>
+            <p class="hint">Your alters will appear here once loaded.</p>
           </div>`;
-        elSummary.textContent = 'Load a JSON file to get started.';
+        elSummary.textContent = '';
         setEnabled(false);
         updateToggle();
         return;
@@ -7779,6 +7838,7 @@
         discordStatus = await discordApi("status");
         updateFrontingPill();
         updateDiscordBtn();
+        render();  // re-draw alter cards so FRONTING badges update immediately
       } catch (_) {}
 
       const s = discordStatus || { linked: false, fronting: [], proxies: [], proxy_enabled: false };
@@ -9609,34 +9669,16 @@
       elTabJournal.classList.toggle("active", tab === "journal");
       elTabFriends.classList.toggle("active", tab === "friends");
 
-      // Update Add button label and toolbar visibility
+      // Update pill label per tab
       if (tab === "alters") {
-        elAddAlter.innerHTML = '<i class="fa-solid fa-plus"></i> Add';
-        elAddAlter.style.display = "";
         elPill.textContent = `${data.length} alters`;
-        elControls.style.display = data.length ? "flex" : "none";
-        elMapBtn.style.display = data.length ? "" : "none";
-        elSearch.style.display = "";
       } else if (tab === "relationships") {
-        elAddAlter.innerHTML = '<i class="fa-solid fa-plus"></i> Add Person';
-        elAddAlter.style.display = "";
         elPill.textContent = `${relData.length} people`;
-        elControls.style.display = "none";
-        elMapBtn.style.display = "none";
-        elSearch.style.display = "none";
       } else if (tab === "journal") {
-        elAddAlter.style.display = "none";
         elPill.textContent = "Journal";
-        elControls.style.display = "none";
-        elMapBtn.style.display = "none";
-        elSearch.style.display = "none";
         loadJournalTab();
       } else if (tab === "friends") {
-        elAddAlter.style.display = "none";
         elPill.textContent = "Friends";
-        elControls.style.display = "none";
-        elMapBtn.style.display = "none";
-        elSearch.style.display = "none";
         loadFriendsTab();
       }
     }
@@ -9659,9 +9701,8 @@
     elFPronouns.addEventListener("change", () => { filters.pronouns = elFPronouns.value; render(); });
     elFAge.addEventListener("change", () => { filters.age = elFAge.value; render(); });
 
-    elAddAlter.addEventListener("click", () => {
-      if (activeTab === "relationships") { addRelationship(); } else { addAlter(); }
-    });
+    elAddAlter.addEventListener("click", () => addAlter());
+    elAddRelBtn.addEventListener("click", () => addRelationship());
 
     // Tab switching
     document.querySelectorAll(".main-tab").forEach(tab => {

@@ -1,9 +1,7 @@
 /**
  * AES-256-GCM encryption at rest.
  *
- * Compatible with the Python backend's cryptography library format:
- *   - 12-byte nonce (IV)
- *   - ciphertext || 16-byte GCM auth tag
+ * Format: 12-byte nonce (IV) + ciphertext || 16-byte GCM auth tag
  */
 
 const crypto = require('crypto');
@@ -40,7 +38,7 @@ function encrypt(plaintext) {
   const cipher = crypto.createCipheriv('aes-256-gcm', key, nonce);
   const encrypted = Buffer.concat([cipher.update(plaintext), cipher.final()]);
   const tag = cipher.getAuthTag(); // 16 bytes
-  // Match Python format: ciphertext || tag
+  // ciphertext includes the 16-byte GCM tag
   return { nonce, ciphertext: Buffer.concat([encrypted, tag]) };
 }
 

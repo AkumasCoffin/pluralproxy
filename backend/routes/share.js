@@ -1,7 +1,7 @@
 /**
  * Routes for /api/share?action=...
  *
- * Mirrors the Python share_api.py CGI endpoints.
+ * Handles share link API actions.
  */
 
 const express = require('express');
@@ -62,7 +62,7 @@ router.get('/', async (req, res) => {
     }
   } catch (err) {
     console.error('[share GET]', err);
-    res.status(500).json({ error: String(err) });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -110,7 +110,7 @@ router.post('/', async (req, res) => {
     }
   } catch (err) {
     console.error('[share POST]', err);
-    res.status(500).json({ error: String(err) });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

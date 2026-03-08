@@ -38,8 +38,6 @@ const CLERK_PK_FALLBACK = CLERK_PK;
 // ── Constants ────────────────────────────────────────────────────────
 const MAX_BACKUPS_PER_USER = 3;
 const SHARE_CODE_LENGTH = 12;
-const LINK_CODE_LENGTH = 6;
-const LINK_CODE_TTL_MINUTES = 10;
 const FRIEND_CODE_LENGTH = 8;
 const MAX_JOURNAL_ENTRIES = 500;
 
@@ -56,8 +54,6 @@ module.exports = {
   PG_PASSWORD,
   MAX_BACKUPS_PER_USER,
   SHARE_CODE_LENGTH,
-  LINK_CODE_LENGTH,
-  LINK_CODE_TTL_MINUTES,
   FRIEND_CODE_LENGTH,
   MAX_JOURNAL_ENTRIES,
   CLERK_PK,

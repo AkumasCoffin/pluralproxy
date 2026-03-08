@@ -39,7 +39,7 @@ router.get('/:type/:file', authenticate, async (req, res) => {
     res.send(content);
   } catch (err) {
     console.error('[data GET]', err);
-    res.status(500).json({ error: String(err) });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -63,17 +63,25 @@ router.put('/:type/:file', authenticate, async (req, res) => {
     }
 
     const body = req.body;
-    if (!Array.isArray(body)) {
-      return res.status(400).json({ error: 'Expected a JSON array' });
+
+    // Alters must be a JSON array; relationships is a JSON object
+    if (type === 'alters') {
+      if (!Array.isArray(body)) {
+        return res.status(400).json({ error: 'Expected a JSON array' });
+      }
+    } else {
+      if (body == null || typeof body !== 'object') {
+        return res.status(400).json({ error: 'Expected a JSON object' });
+      }
     }
 
     const jsonBytes = JSON.stringify(body);
     await writeUserData(urlUserId, type, jsonBytes);
 
-    res.json({ ok: true, count: body.length });
+    res.json({ ok: true, count: Array.isArray(body) ? body.length : 1 });
   } catch (err) {
     console.error('[data PUT]', err);
-    res.status(500).json({ error: String(err) });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

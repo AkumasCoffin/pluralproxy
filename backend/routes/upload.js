@@ -10,7 +10,7 @@ const { authenticate } = require('../lib/auth');
 const { PROJECT_DIR } = require('../lib/config');
 
 const IMAGES_DIR = path.join(PROJECT_DIR, 'assets', 'images');
-const ALLOWED_EXTENSIONS = new Set(['png', 'jpg', 'gif']);
+const ALLOWED_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'gif']);
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 // POST /assets/images/:filename
@@ -64,7 +64,7 @@ router.post('/images/:filename', authenticate, (req, res) => {
     res.json({ ok: true, path: `/assets/images/${uuid}.${ext}` });
   } catch (err) {
     console.error('[upload]', err);
-    res.status(500).json({ error: String(err) });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

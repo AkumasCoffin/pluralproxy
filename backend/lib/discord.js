@@ -7,7 +7,6 @@ const { pool, withTransaction, now, toJsonSafe } = require('./db');
 const { encryptField, decryptField } = require('./encryption');
 const { ensureUser, getUser, getUserByDiscord } = require('./users');
 const { getAlterInfo, extractAlterName } = require('./alters');
-const { LINK_CODE_LENGTH, LINK_CODE_TTL_MINUTES } = require('./config');
 const crypto = require('crypto');
 
 // ── Clerk Backend API ────────────────────────────────────────────────
@@ -100,25 +99,29 @@ async function autoLinkDiscord(userId, frontendDiscordId = null) {
 // ── Proxy settings ───────────────────────────────────────────────────
 
 async function setProxyEnabled(userId, enabled) {
-  await pool.query(
-    'UPDATE user_discord_settings SET proxy_enabled = $1 WHERE user_id = $2',
-    [enabled, userId]
-  );
-  await pool.query(
-    'UPDATE users SET updated_at = $1 WHERE user_id = $2',
-    [now(), userId]
-  );
+  await withTransaction(async (client) => {
+    await client.query(
+      'UPDATE user_discord_settings SET proxy_enabled = $1 WHERE user_id = $2',
+      [enabled, userId]
+    );
+    await client.query(
+      'UPDATE users SET updated_at = $1 WHERE user_id = $2',
+      [now(), userId]
+    );
+  });
 }
 
 async function setAutoproxyEnabled(userId, enabled) {
-  await pool.query(
-    'UPDATE user_discord_settings SET autoproxy_enabled = $1 WHERE user_id = $2',
-    [enabled, userId]
-  );
-  await pool.query(
-    'UPDATE users SET updated_at = $1 WHERE user_id = $2',
-    [now(), userId]
-  );
+  await withTransaction(async (client) => {
+    await client.query(
+      'UPDATE user_discord_settings SET autoproxy_enabled = $1 WHERE user_id = $2',
+      [enabled, userId]
+    );
+    await client.query(
+      'UPDATE users SET updated_at = $1 WHERE user_id = $2',
+      [now(), userId]
+    );
+  });
 }
 
 // ── Fronting ─────────────────────────────────────────────────────────
@@ -287,52 +290,6 @@ async function matchProxy(discordId, message) {
   return null;
 }
 
-// ── Link codes (legacy) ──────────────────────────────────────────────
-
-const _LINK_CODE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-
-async function generateLinkCode(userId) {
-  return withTransaction(async (client) => {
-    await ensureUser(client, userId);
-    const ts = now();
-    await client.query('DELETE FROM link_codes WHERE expires_at < $1', [ts]);
-    await client.query('DELETE FROM link_codes WHERE user_id = $1', [userId]);
-
-    let code = '';
-    for (let i = 0; i < LINK_CODE_LENGTH; i++) {
-      code += _LINK_CODE_CHARS[crypto.randomInt(_LINK_CODE_CHARS.length)];
-    }
-
-    const expiresAt = new Date(Date.now() + LINK_CODE_TTL_MINUTES * 60 * 1000).toISOString();
-    await client.query(
-      'INSERT INTO link_codes (code, user_id, created_at, expires_at) VALUES ($1, $2, $3, $4)',
-      [code, userId, ts, expiresAt]
-    );
-    return code;
-  });
-}
-
-async function redeemLinkCode(code, discordId) {
-  return withTransaction(async (client) => {
-    const ts = now();
-    await client.query('DELETE FROM link_codes WHERE expires_at < $1', [ts]);
-    const { rows } = await client.query(
-      'SELECT user_id FROM link_codes WHERE code = $1',
-      [code.toUpperCase().trim()]
-    );
-    if (!rows[0]) return null;
-    const userId = rows[0].user_id;
-
-    // Check for existing link to different account
-    const existing = await getUserByDiscord(discordId);
-    if (existing && existing.user_id !== userId) return null;
-
-    await linkDiscord(userId, discordId);
-    await client.query('DELETE FROM link_codes WHERE code = $1', [code]);
-    return userId;
-  });
-}
-
 module.exports = {
   getDiscordIdFromClerk,
   linkDiscord,
@@ -351,6 +308,4 @@ module.exports = {
   getProxies,
   removeProxy,
   matchProxy,
-  generateLinkCode,
-  redeemLinkCode,
 };

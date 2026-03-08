@@ -154,16 +154,6 @@ async function readUserData(userId, dataType) {
   if (dataType === 'alters') {
     const alters = await reconstructAllAlters(pool, userId);
     if (alters.length) return JSON.stringify(alters);
-
-    // Fallback: check for un-migrated blob
-    const { rows } = await pool.query(
-      `SELECT nonce, ciphertext FROM user_data
-       WHERE user_id = $1 AND data_type = 'alters'`,
-      [userId]
-    );
-    if (rows[0]) {
-      return decrypt(rows[0].nonce, rows[0].ciphertext).toString('utf-8');
-    }
     return null;
   }
 

@@ -1,7 +1,7 @@
 /**
  * Routes for /api/friends?action=...
  *
- * Mirrors the Python friends_api.py CGI endpoints.
+ * Handles friends system API actions.
  */
 
 const express = require('express');
@@ -70,7 +70,7 @@ router.get('/', async (req, res) => {
     }
   } catch (err) {
     console.error('[friends GET]', err);
-    res.status(500).json({ error: String(err) });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -142,7 +142,7 @@ router.post('/', async (req, res) => {
     }
   } catch (err) {
     console.error('[friends POST]', err);
-    res.status(500).json({ error: String(err) });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

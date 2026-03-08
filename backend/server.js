@@ -1,7 +1,7 @@
 /**
- * Express entry point — replaces the Python CGI / Apache setup.
+ * Express entry point.
  *
- * Routes mirror the Apache .htaccess rewrite rules:
+ * Routes:
  *   /data/{alters|relationships}/{user_id}.json  → routes/data.js
  *   /assets/images/{uuid}.{ext}                  → routes/upload.js
  *   /api/discord                                 → routes/discord.js
@@ -30,7 +30,7 @@ app.use(cors({
 
 // ── Body parsing ─────────────────────────────────────────────────────
 
-// JSON for most API routes (5 MB limit to match Python backend)
+// JSON for most API routes (5 MB limit)
 app.use(express.json({ limit: '5mb' }));
 
 // Raw binary for image uploads only (POST /assets/images/*)
@@ -82,12 +82,13 @@ app.get('/health', (req, res) => {
 
 /**
  * Read an HTML file and replace {{PLACEHOLDER}} tokens with env values.
- * Results are cached in memory so the file is only read once.
+ * In production the result is cached; in dev it's re-read every request.
  */
 const _htmlCache = {};
+const _cacheHtml = process.env.NODE_ENV === 'production';
 function serveHtml(filePath) {
   return (req, res) => {
-    if (!_htmlCache[filePath]) {
+    if (!_cacheHtml || !_htmlCache[filePath]) {
       let html = fs.readFileSync(filePath, 'utf8');
       html = html
         .replace(/\{\{SITE_URL\}\}/g, SITE_URL)

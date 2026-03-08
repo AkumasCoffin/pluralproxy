@@ -2,7 +2,7 @@
  * PostgreSQL connection pool + schema initialization.
  *
  * Creates all tables (IF NOT EXISTS) and indexes on first use.
- * Matches the Python db.py schema exactly for full compatibility.
+ * Schema is auto-created on first startup.
  */
 
 const { Pool } = require('pg');
@@ -220,15 +220,6 @@ CREATE TABLE IF NOT EXISTS share_claims (
     PRIMARY KEY (share_code, user_id)
 );
 
--- ── Account linking codes ───────────────────────────────────────────
-
-CREATE TABLE IF NOT EXISTS link_codes (
-    code       TEXT PRIMARY KEY,
-    user_id    TEXT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    created_at TIMESTAMPTZ NOT NULL,
-    expires_at TIMESTAMPTZ NOT NULL
-);
-
 -- ── Friends ──────────────────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS friend_requests (
@@ -317,11 +308,6 @@ CREATE TABLE IF NOT EXISTS journal_entry_tags (
     PRIMARY KEY (entry_id, tag_id)
 );
 
--- ── Migration flags (kept for compat with Python backend) ───────────
-CREATE TABLE IF NOT EXISTS _migration_flags (
-    name TEXT PRIMARY KEY,
-    migrated_at TEXT
-);
 `;
 
 const SCHEMA_INDEXES = [
@@ -331,7 +317,7 @@ const SCHEMA_INDEXES = [
   'CREATE INDEX IF NOT EXISTS idx_shares_owner ON shares(owner_id)',
   'CREATE INDEX IF NOT EXISTS idx_proxies_user ON discord_proxies(user_id)',
   'CREATE INDEX IF NOT EXISTS idx_share_claims_user ON share_claims(user_id)',
-  'CREATE INDEX IF NOT EXISTS idx_link_codes_expiry ON link_codes(expires_at)',
+
   'CREATE INDEX IF NOT EXISTS idx_friend_requests_to ON friend_requests(to_user, status)',
   'CREATE INDEX IF NOT EXISTS idx_friend_requests_from ON friend_requests(from_user, status)',
   'CREATE INDEX IF NOT EXISTS idx_friend_shares_friend ON friend_shares(friend_id)',
