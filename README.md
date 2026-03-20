@@ -2,6 +2,8 @@
 
 A private, encrypted dashboard for DID/OSDD plural systems — organize alter profiles, track fronting, map relationships, share with friends, journal, and let alters speak on Discord.
 
+**Live site:** https://pluralproxy.forcequit.xyz
+
 ---
 
 ## Requirements
